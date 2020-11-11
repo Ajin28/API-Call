@@ -1,0 +1,10 @@
+#ay_bot {
+    height: 100%;
+    /* display: -webkit-flex; */
+    width: 100%;
+}
+
+.options {
+    border: none;
+    background-color: #0769AD;
+}

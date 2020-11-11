@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+</head>
+
+<body>
+    <h2>Web Chat bot client using Direct Line</h2>
+
+    <div id="webchat" role="main"></div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://agreeyabotstorage.blob.core.windows.net/chat-wrapper/index.js"></script>
+
+    <script>
+        // "styleSet" is a set of CSS rules which are generated from "styleOptions"
+        const styleSet = window.WebChat.createStyleSet({
+            bubbleBackground: 'rgba(0, 0, 255, .1)',
+            bubbleFromUserBackground: 'rgba(0, 255, 0, .1)',
+            botAvatarImage: 'https://docs.microsoft.com/en-us/azure/bot-service/v4sdk/media/logo_bot.svg?view=azure-bot-service-4.0',
+            botAvatarInitials: 'BF',
+            userAvatarImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/900px-Instagram_icon.png',
+            userAvatarInitials: 'WC',
+            rootHeight: '100%',
+            rootWidth: '100%'
+        });
+
+        // After generated, you can modify the CSS rules
+        styleSet.textContent = {
+            ...styleSet.textContent,
+            fontFamily: "'Comic Sans MS', 'Arial', sans-serif",
+            fontWeight: 'bold'
+        };
+
+        //const res = await fetch('https:<YOUR_TOKEN_SERVER/API>', { method: 'POST' });
+        //const { token } = await res.json();
+        const token = "ew0KICAiYWxnIjogIlJTMjU2IiwNCiAgImtpZCI6ICJsY0oxTXFpNkdKYXdCZEw5Y0dieEt5S1R6OE0iLA0KICAieDV0IjogImxjSjFNcWk2R0phd0JkTDljR2J4S3lLVHo4TSIsDQogICJ0eXAiOiAiSldUIg0KfQ.ew0KICAiYm90IjogInB1YmxpYy1heWJvdC14eW9xNXFkIiwNCiAgInNpdGUiOiAiMXd5ZmpNcXdaRHMiLA0KICAiY29udiI6ICI1V2o1TTRibUZBQmV0Qmc1YlVHOUQtbyIsDQogICJuYmYiOiAxNjA0NTIyMzU5LA0KICAiZXhwIjogMTYwNDUyNTk1OSwNCiAgImlzcyI6ICJodHRwczovL2RpcmVjdGxpbmUuYm90ZnJhbWV3b3JrLmNvbS8iLA0KICAiYXVkIjogImh0dHBzOi8vZGlyZWN0bGluZS5ib3RmcmFtZXdvcmsuY29tLyINCn0.mTTGhbsi34L0auHh9tyENahbzTUyXQ0ZhR-DgTn4OeQlCfM1HYpD8sDIpyneJazC6xLDgp4GqbAhQTEAlMfSPZyLKdPr9h-FSGPri5a1d6tJiRM8R3SR7gOhAr4mMw_tOpLchK_wAjLQjYtxj9CbPGFDBmEUz7KO1l8wxKxLm4F8YSOd0-Ckm1fCU9AiZFXWw8vahvDeiRKRF3ChNxN4_w9lDaMsVAJV14bUUXdfyWMxouh6eBflaPyLe5sV_fbCNiqSbjVz8gnzy8mOOmAKKZ27rMaqx5SBSm3ykJUkRcTCjSqUS3rOXRnp8Esy9kGeHNZ-adO517aaYbU_rPA3Eg"
+        window.WebChat.renderWebChat({
+                directLine: window.WebChat.createDirectLine({
+                    token
+                }),
+                userID: 'WebChat_UserId',
+                locale: 'en-US',
+                username: 'Web Chat User',
+                locale: 'en-US',
+                // Passing 'styleSet' when rendering Web Chat
+                styleSet,
+                webSpeechPonyfillFactory: window.WebChat.createBrowserWebSpeechPonyfillFactory()
+
+            },
+            document.getElementById('webchat')
+        );
+    </script>
+</body>
+
+</html>

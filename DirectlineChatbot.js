@@ -73,28 +73,19 @@ async function api() {
     console.log(selectedLang);
 
 
-    const store = window.WebChat.createStore({}, ({ dispatch }) => next => action => {
-        return next(action);
-    });
+
 
 
     window.WebChat.renderWebChat({
-        directLine: window.WebChat.createDirectLine({ token }),
-        locale: selectedLang,
-        // Passing 'styleSet' when rendering Web Chat
-        styleSet,
-        webSpeechPonyfillFactory: window.WebChat.createBrowserWebSpeechPonyfillFactory(),
-        store
-    },
+            directLine: window.WebChat.createDirectLine({ token }),
+            locale: selectedLang,
+            // Passing 'styleSet' when rendering Web Chat
+            styleSet,
+            webSpeechPonyfillFactory: window.WebChat.createBrowserWebSpeechPonyfillFactory(),
+
+        },
         document.getElementById('ay_bot')
     );
-
-    document.querySelector('#helpButton').addEventListener('click', () => {
-        store.dispatch({
-            type: 'WEB_CHAT/SEND_MESSAGE',
-            payload: { text: 'help' }
-        });
-    });
 }
 
 function toggleChatbox(slidedirection) {
@@ -133,12 +124,12 @@ function build() {
 
     var header_div1 =
         $('<div/>', { "class": "ay_chatbotImgContainer" })
-            .append(
-                [
-                    $('<img/>', { 'src': custom.wrapper.bot_avatar, 'class': 'ay_chatbotimg' }),
-                    $('<span/>', { 'class': 'ay_botName', 'text': custom.wrapper.bot_name })
-                ]
-            )
+        .append(
+            [
+                $('<img/>', { 'src': custom.wrapper.bot_avatar, 'class': 'ay_chatbotimg' }),
+                $('<span/>', { 'class': 'ay_botName', 'text': custom.wrapper.bot_name })
+            ]
+        )
 
     var dropdown = $('<span/>', { 'class': "ay_languageDDLContainer" }).append(
         $('<select/>', { 'id': 'lang', 'class': 'ay_languageDDL' }).append(
@@ -153,7 +144,7 @@ function build() {
     )
 
     var btn1 =
-        $('<button/>', { 'class': "helpicon", 'id': 'helpButton', 'title': "Help" }).append(
+        $('<button/>', { 'class': "helpicon", 'title': "Help" }).append(
             $('<span/>', { 'class': "ms-Icon ms-Icon--Help", 'aria-hidden': "true" })
         )
     var btn2 =
@@ -170,7 +161,7 @@ function build() {
 
     var header =
         $('<div/>', { "class": "ay_chatboxheaderContainer", 'style': `background-color:${custom.wrapper.color}` })
-            .append(header_div1, header_div2);
+        .append(header_div1, header_div2);
 
     var body_div2 =
         $('<div/>', { 'class': 'ay_chatboticon ay_rightAlign setAlignment', 'style': `background-color:${custom.wrapper.color}` }).append(
@@ -197,12 +188,14 @@ function build() {
         )
     );
 
+
+    $("#lang").change(renderWebChat);
+
 }
 
 function renderWebChat() {
-    api();
-}
 
-function help() {
+
+    api();
 
 }
