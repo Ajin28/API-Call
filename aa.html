@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://cdn.botframework.com/botframework-webchat/latest/botchat.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="bot" />
+    <script src="https://cdn.botframework.com/botframework-webchat/latest/botchat.js"></script>
+    <script>
+        BotChat.App({
+            directLine: { token: 'ew0KICAiYWxnIjogIlJTMjU2IiwNCiAgImtpZCI6ICJsY0oxTXFpNkdKYXdCZEw5Y0dieEt5S1R6OE0iLA0KICAieDV0IjogImxjSjFNcWk2R0phd0JkTDljR2J4S3lLVHo4TSIsDQogICJ0eXAiOiAiSldUIg0KfQ.ew0KICAiYm90IjogInB1YmxpYy1heWJvdC14eW9xNXFkIiwNCiAgInNpdGUiOiAiMXd5ZmpNcXdaRHMiLA0KICAiY29udiI6ICJFZmR3Z3VBUHIyMkdNSHZ5Z3Q5N3FDLW8iLA0KICAibmJmIjogMTYwNTU3NTg4NiwNCiAgImV4cCI6IDE2MDU1Nzk0ODYsDQogICJpc3MiOiAiaHR0cHM6Ly9kaXJlY3RsaW5lLmJvdGZyYW1ld29yay5jb20vIiwNCiAgImF1ZCI6ICJodHRwczovL2RpcmVjdGxpbmUuYm90ZnJhbWV3b3JrLmNvbS8iDQp9.HaOhsnZDQNXtQ591Zt7hdN3n280e4M2oxcZRv-68ePAPWZ-HzewDb5mHXk8Gwv7RlLwkR6M8rmp_oe8Nic7YqKZ7GSLKNsDSMJWkQWqd6i8AvPnwCOvBIDbC45nTx-8mKV7m8v9u3immO5_MCz1bWitVWHWFgZCTmbqCU_Y5LpK7_QGKazZlMIRByGwcFDcDYywzLxQ7MlQulgzADqnoktFZxwR85AtIU8XmyfovZlyd49-sa45SHCESyFQT_KRXWUtzdkrzxJTRGaDz5VwkvoDkUXgabJRjMNpzjwKjXpka1R0hsnVWOkrkCFsn9ow7rpDEfmxACPRtVXTpHrjIHw' },
+            user: { id: 'userid' },
+            bot: { id: 'botid' },
+            resize: 'detect'
+        }, document.getElementById("bot"));
+    </script>
+</body>
+
+</html>

@@ -1,6 +1,4 @@
 //Customiztion
-
-
 const custom = {
     wrapper: {
         color: "#0769AD",
@@ -19,26 +17,23 @@ const custom = {
         fontWeight: '400'
 
 
-    }
+    },
+    css: "https://agreeyabotstorage.blob.core.windows.net/chat-wrapper/wordpress_agreeya.css"
+
 
 }
 
+async function getToken() {
+    const res = await fetch("https://aybotazurefunctionapp.azurewebsites.net/api/GenerateDirectLineToken?code=swhdQ830yeVmGlROB5K6rqQo/b32jLWT9JyPSdDmMsldGiLuyV0vkQ==", { method: "post" });
+    const json = await res.json();
+    const token = json.token.token;
+    console.log(token);
+    return token;
+}
 
+async function api(token) {
 
-
-
-
-
-
-
-async function api() {
-    //console.log("stated")
-    //let response = await fetch("https://aybotazurefunctionapp.azurewebsites.net/api/GenerateAYBotToken?code=DjpE11lNWCsOaKN1OZIUjOHhAPb/4ze6JdCNqGS2Qcddp5VSLeESdQ==");
-    //let token = await response.json();
-    //console.log(token)
-    //document.getElementById("ay_bot").src = token.source
-
-    const styleSet = window.WebChat.createStyleSet({
+    const styleSet = {
         alignItems: "left",
         justifyContent: "left",
         bubbleBackground: custom.chatbot.bot_bubble_color,
@@ -51,41 +46,134 @@ async function api() {
         rootWidth: '100%',
         bubbleFromUserBorderRadius: 5,
         bubbleBorderRadius: 5,
-
-
-    });
-
-    // After generated, you can modify the CSS rules
+    };
     styleSet.textContent = {
         ...styleSet.textContent,
         fontFamily: custom.chatbot.fontFamily,
         fontWeight: custom.chatbot.fontWeight
     };
 
-    //const res = await fetch('https:<YOUR_TOKEN_SERVER/API>', { method: 'POST' });
-    //const { token } = await res.json();
-    const res = await fetch("https://aybotazurefunctionapp.azurewebsites.net/api/GenerateDirectLineToken?code=swhdQ830yeVmGlROB5K6rqQo/b32jLWT9JyPSdDmMsldGiLuyV0vkQ==", { method: "post" });
-    const json = await res.json();
-    const token = json.token.token;
-    console.log(token);
 
+    const {
+        hooks: { usePostActivity },
+        ReactWebChat
+    } = window.WebChat;
+    const { useCallback } = window.React;
     const selectedLang = $("#lang option:selected").val();
     console.log(selectedLang);
 
 
 
 
+    const store = window.WebChat.createStore({}, ({ dispatch }) => next => action => {
+        return next(action);
+    });
+    document.querySelector('#helpButton').addEventListener('click', () => {
+        store.dispatch({
+            type: 'WEB_CHAT/SEND_MESSAGE',
+            payload: { text: 'help' }
+        });
+    });
 
-    window.WebChat.renderWebChat({
-        directLine: window.WebChat.createDirectLine({ token }),
-        locale: selectedLang,
-        // Passing 'styleSet' when rendering Web Chat
-        styleSet,
-        webSpeechPonyfillFactory: window.WebChat.createBrowserWebSpeechPonyfillFactory(),
+    const BotActivityDecorator = ({ activityID, children }) => {
+        const [{ feedbackGiven, activateButtons, selectedButton }, setFeedbackState] =
+            React.useState({ feedbackGiven: false, activateButtons: false, selectedButton: '' });
 
-    },
+
+        const upButtonClass = selectedButton === 'UP' ?
+            'botActivityDecorator__button selected' : 'botActivityDecorator__button';
+        const downButtonClass = selectedButton === 'DOWN' ?
+            'botActivityDecorator__button selected' : 'botActivityDecorator__button';
+
+
+        const postActivity = usePostActivity();
+        const handleDownvoteButton = useCallback(() => {
+            postActivity({
+                type: "DIRECT_LINE/POST_ACTIVITY",
+                meta: "keyboard",
+                payload: {
+                    activity: {
+                        name: "reactionAdded",
+                        type: "messageReaction",
+                        value: { activityID },
+                        reactionsAdded: [{ activityID, helpful: -1 }],
+                        replyToID: activityID
+                    }
+                }
+            });
+        }, [activityID, postActivity]);
+
+        const handleUpvoteButton = useCallback(() => {
+            postActivity({
+                type: "DIRECT_LINE/POST_ACTIVITY",
+                meta: "keyboard",
+                payload: {
+                    activity: {
+                        name: "reactionAdded",
+                        type: "messageReaction",
+                        value: { activityID },
+                        reactionsAdded: [{ activityID, helpful: -1 }],
+                        replyToID: activityID
+                    }
+                }
+            });
+        }, [activityID, postActivity]);
+
+        return <div className="botActivityDecorator" onMouseEnter={() =>
+            setFeedbackState({ feedbackGiven, activateButtons: true, selectedButton })}
+            onMouseLeave={() => setFeedbackState({ feedbackGiven, activateButtons: false, selectedButton })}>
+            {children}
+
+            {activateButtons && <div className="botActivityDecorator__buttonBar">
+                <button className={upButtonClass + ' up'}
+                    disabled={feedbackGiven}
+                    onClick={() => {
+                        setFeedbackState({ feedbackGiven: true, activateButtons, selectedButton: 'UP' });
+                        handleDownvoteButton();
+
+                    }}><span className="far fa-thumbs-up"></span></button>
+                <button className={downButtonClass + ' down'}
+                    disabled={feedbackGiven}
+
+                    onClick={() => {
+                        setFeedbackState({ feedbackGiven: true, activateButtons, selectedButton: 'DOWN' });
+                        handleUpvoteButton();
+
+                    }}><span className="far fa-thumbs-down"></span></button>
+            </div>}
+        </div>;
+    }
+
+    const activityMiddleware = () => next => (...setUpArgs) => {
+        const [card] = setUpArgs;
+
+        if (card.activity.from.role === 'bot' && !card.activity.HideFeedbackButtons) {
+            return (...renderArgs) => (
+                <BotActivityDecorator key={card.activity.id} activityID={card.activity.id}>
+                    {next(card)(...renderArgs)}
+                </BotActivityDecorator>
+            );
+        }
+
+        return next(card);
+    };
+    window.ReactDOM.render(
+        <ReactWebChat
+            styleOptions={styleSet}
+            activityMiddleware={activityMiddleware}
+            store={store}
+            webSpeechPonyfillFactory={window.WebChat.createBrowserWebSpeechPonyfillFactory()}
+            locale={selectedLang}
+            directLine={window.WebChat.createDirectLine({ token })}
+        />,
+
+
+
         document.getElementById('ay_bot')
     );
+
+
+
 }
 
 function toggleChatbox(slidedirection) {
@@ -96,14 +184,17 @@ function switchChatbox() {
     $('.setAlignment').toggleClass('ay_leftAlign').toggleClass('ay_rightAlign');
 }
 
-function init() {
+async function init() {
+    const token = await getToken().catch((e) => { console.log("Token error" + e) });
+    console.log(token);
     build();
-    api();
+    api(token);
 }
 
 function build() {
     $('head').append(
         [
+            //sharepoint
             $('<link/>', { 'rel': "stylesheet", 'href': "https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.4.0/css/fabric.min.css" }),
             $('<link/>', { 'rel': "stylesheet", 'href': "https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.4.0/css/fabric.components.min.css" }),
             $('<script/>', { 'src': "https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.4.0/js/fabric.min.js" }),
@@ -113,10 +204,7 @@ function build() {
             $('<script/>', { 'src': "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js", 'integrity': "sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q", 'crossorigin': "anonymous" }),
             $('<script/>', { 'src': "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js", 'integrity': "sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl", 'crossorigin': "anonymous" }),
             //custom stylesheet
-            $('<link/>', { 'rel': "stylesheet", 'href': "https://agreeyabotstorage.blob.core.windows.net/chat-wrapper/stylesheet.css" }),
-            //webchat cnd
-            $('<script/>', { 'src': "https://cdn.botframework.com/botframework-webchat/latest/webchat.js" })
-
+            $('<link/>', { 'rel': "stylesheet", 'href': custom.css }),
         ]
     )
 
@@ -144,7 +232,7 @@ function build() {
     )
 
     var btn1 =
-        $('<button/>', { 'class': "helpicon", 'title': "Help" }).append(
+        $('<button/>', { 'class': "helpicon", 'id': 'helpButton', 'title': "Help" }).append(
             $('<span/>', { 'class': "ms-Icon ms-Icon--Help", 'aria-hidden': "true" })
         )
     var btn2 =
@@ -188,14 +276,11 @@ function build() {
         )
     );
 
-
     $("#lang").change(renderWebChat);
 
 }
 
-function renderWebChat() {
-
-
-    api();
-
+async function renderWebChat() {
+    const token = await getToken().catch((e) => { console.log("Token error" + e) })
+    api(token);
 }
