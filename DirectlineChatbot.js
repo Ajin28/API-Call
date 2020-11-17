@@ -72,6 +72,12 @@ async function api() {
     const selectedLang = $("#lang option:selected").val();
     console.log(selectedLang);
 
+    const styleOptions = {
+        botAvatarImage: custom.chatbot.bot_avatar_image,
+        botAvatarInitials: custom.chatbot.bot_avatar_initails,
+        //userAvatarImage: custom.chatbot.user_avatar,
+        userAvatarInitials: custom.chatbot.user_avatar_intials,
+    };
 
 
 
@@ -80,7 +86,7 @@ async function api() {
         directLine: window.WebChat.createDirectLine({ token }),
         locale: selectedLang,
         // Passing 'styleSet' when rendering Web Chat
-        styleSet,
+        styleOptions,
         webSpeechPonyfillFactory: window.WebChat.createBrowserWebSpeechPonyfillFactory(),
 
     },

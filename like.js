@@ -129,7 +129,7 @@ async function api(token) {
                     disabled={feedbackGiven}
                     onClick={() => {
                         setFeedbackState({ feedbackGiven: true, activateButtons, selectedButton: 'UP' });
-                        handleDownvoteButton();
+                        // handleDownvoteButton();
 
                     }}><span className="far fa-thumbs-up"></span></button>
                 <button className={downButtonClass + ' down'}
@@ -137,7 +137,7 @@ async function api(token) {
 
                     onClick={() => {
                         setFeedbackState({ feedbackGiven: true, activateButtons, selectedButton: 'DOWN' });
-                        handleUpvoteButton();
+                        // handleUpvoteButton();
 
                     }}><span className="far fa-thumbs-down"></span></button>
             </div>}
@@ -147,15 +147,16 @@ async function api(token) {
     const activityMiddleware = () => next => (...setUpArgs) => {
         const [card] = setUpArgs;
 
-        if (card.activity.from.role === 'bot' && !card.activity.HideFeedbackButtons) {
+        if (card.activity.from.role === 'bot' && !card.activity.HideFeedbackButtos) {
             return (...renderArgs) => (
                 <BotActivityDecorator key={card.activity.id} activityID={card.activity.id}>
                     {next(card)(...renderArgs)}
                 </BotActivityDecorator>
             );
         }
-
-        return next(card);
+        else {
+            return next(card);
+        }
     };
     window.ReactDOM.render(
         <ReactWebChat
